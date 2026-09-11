@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import Providers from "@/providers";
 import QueryProvider from "@/providers/query.provider";
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Providers>
           <QueryProvider>
             {children}
+            <Toaster />
           </QueryProvider>
         </Providers>
       </body>

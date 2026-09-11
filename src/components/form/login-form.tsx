@@ -9,10 +9,11 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { Spinner } from "../ui/spinner";
+import { toast } from "../ui/toast";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState("");
 
   const router = useRouter();
 
@@ -27,8 +28,6 @@ export default function LoginForm() {
       onSubmit: loginSchema,
     },
     onSubmit: ({ value }) => {
-      setLoginError("");
-
       const loginData = {
         email: value.email,
         password: value.password,
@@ -36,16 +35,22 @@ export default function LoginForm() {
 
       login(loginData, {
         onSuccess: (res) => {
-          console.log(res);
+          toast.add({
+            title: "Login Successful",
+            description: "Welcome to PH Healthcare",
+            type: "Success",
+          })
           router.push("/");
         },
+
         onError: (err) => {
-          setLoginError(
-            err instanceof Error
-              ? err.message
-              : "Login failed. Please try again.",
-          );
+          toast.add({
+            title: "Login Failed",
+            description: err instanceof Error ? err.message : "Login failed. Please try again.",
+            type: "Error",
+          })
         },
+
       });
     },
   });
@@ -123,11 +128,15 @@ export default function LoginForm() {
               );
             }}
           </form.Field>
-          {loginError && (
-            <p className="text-sm font-medium text-destructive">{loginError}</p>
-          )}
           <Button type="submit" disabled={loginPending}>
-            {loginPending ? "Logging in..." : "Submit"}
+            {loginPending ? (
+              <>
+                <Spinner />
+                Logging in...
+              </>
+            ) : (
+              "Submit"
+            )}
           </Button>
         </FieldGroup>
       </form>
