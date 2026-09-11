@@ -1,15 +1,22 @@
 "use client";
 
+import { useLogin } from "@/hooks";
+import { loginSchema } from "@/validation";
 import { useForm } from "@tanstack/react-form";
-import { Input } from "../ui/input";
+import { Eye, EyeClosed } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
-import { loginSchema } from "@/validation";
-import { useState } from "react";
-import { Eye, EyeClosed } from "lucide-react";
+import { Input } from "../ui/input";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
+
+  const router = useRouter();
+
+  const { mutate: login, isPending: loginPending } = useLogin();
 
   const form = useForm({
     defaultValues: {
@@ -20,7 +27,26 @@ export default function LoginForm() {
       onSubmit: loginSchema,
     },
     onSubmit: ({ value }) => {
-      console.log(value);
+      setLoginError("");
+
+      const loginData = {
+        email: value.email,
+        password: value.password,
+      };
+
+      login(loginData, {
+        onSuccess: (res) => {
+          console.log(res);
+          router.push("/");
+        },
+        onError: (err) => {
+          setLoginError(
+            err instanceof Error
+              ? err.message
+              : "Login failed. Please try again.",
+          );
+        },
+      });
     },
   });
 
@@ -44,9 +70,7 @@ export default function LoginForm() {
         <FieldGroup>
           <form.Field name="email">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -54,8 +78,8 @@ export default function LoginForm() {
                     id={field.name}
                     name={field.name}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
                     value={field.state.value}
+                    onBlur={field.handleBlur}
                     autoComplete="off"
                     aria-invalid={isInvalid}
                   />
@@ -67,9 +91,7 @@ export default function LoginForm() {
 
           <form.Field name="password">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -101,8 +123,12 @@ export default function LoginForm() {
               );
             }}
           </form.Field>
-
-          <Button type="submit">Submit</Button>
+          {loginError && (
+            <p className="text-sm font-medium text-destructive">{loginError}</p>
+          )}
+          <Button type="submit" disabled={loginPending}>
+            {loginPending ? "Logging in..." : "Submit"}
+          </Button>
         </FieldGroup>
       </form>
     </div>

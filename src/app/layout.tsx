@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import Providers from "@/providers";
+import QueryProvider from "@/providers/query.provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
@@ -34,9 +35,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers>
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </Providers>
       </body>
     </html>
