@@ -4,25 +4,32 @@ import { useLogin } from "@/hooks";
 import { loginSchema } from "@/validation";
 import { useForm } from "@tanstack/react-form";
 import { Eye, EyeClosed } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import GoogleLoginComponent from "../modules/google-login/GoogleLogin";
 import { Button } from "../ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
 import { toast } from "../ui/toast";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
   const router = useRouter();
 
   const { mutate: login, isPending: loginPending } = useLogin();
 
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "superadmin@gmail.com",
+      password: "Super@admin12345",
     },
     validators: {
       onSubmit: loginSchema,
@@ -36,21 +43,20 @@ export default function LoginForm() {
       login(loginData, {
         onSuccess: (res) => {
           toast.add({
-            title: "Login Successful",
-            description: "Welcome to PH Healthcare",
-            type: "Success",
-          })
+            title: "Login Success",
+            description: "Welcome back",
+            type: "success",
+          });
           router.push("/");
         },
-
         onError: (err) => {
           toast.add({
-            title: "Login Failed",
-            description: err instanceof Error ? err.message : "Login failed. Please try again.",
-            type: "Error",
-          })
+            title: "Authorization failure",
+            description:
+              err.message || "Something went wrong. Please try again",
+            type: "error",
+          });
         },
-
       });
     },
   });
@@ -75,7 +81,9 @@ export default function LoginForm() {
         <FieldGroup>
           <form.Field name="email">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -83,8 +91,8 @@ export default function LoginForm() {
                     id={field.name}
                     name={field.name}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    value={field.state.value}
                     onBlur={field.handleBlur}
+                    value={field.state.value}
                     autoComplete="off"
                     aria-invalid={isInvalid}
                   />
@@ -96,7 +104,9 @@ export default function LoginForm() {
 
           <form.Field name="password">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -128,11 +138,11 @@ export default function LoginForm() {
               );
             }}
           </form.Field>
-          <Button type="submit" disabled={loginPending}>
+
+          <Button disabled={loginPending} type="submit">
             {loginPending ? (
               <>
-                <Spinner />
-                Logging in...
+                <Spinner /> submitting
               </>
             ) : (
               "Submit"
@@ -140,6 +150,20 @@ export default function LoginForm() {
           </Button>
         </FieldGroup>
       </form>
+
+      <FieldSeparator>Or continue with</FieldSeparator>
+
+      <GoogleLoginComponent />
+
+      <div className="text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/register"
+          className="font-medium underline underline-offset-4 hover:text-primary"
+        >
+          Register
+        </Link>
+      </div>
     </div>
   );
 }

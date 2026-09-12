@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import Providers from "@/providers";
-import QueryProvider from "@/providers/query.provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
@@ -24,6 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const googleClientId = process.env.GOOGLE_CLIENT_ID;
+
   return (
     <html
       lang="en"
@@ -37,11 +38,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <Providers>
-          <QueryProvider>
-            {children}
-            <Toaster />
-          </QueryProvider>
+        <Providers googleClientId={googleClientId}>
+          {children}
+          <Toaster />
         </Providers>
       </body>
     </html>
