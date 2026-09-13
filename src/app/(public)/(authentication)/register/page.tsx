@@ -1,3 +1,4 @@
+import { RegisterForm } from "@/components/form/register-form";
 import Logo from "@/svg/Logo";
 
 import Link from "next/link";
@@ -16,7 +17,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="flex flex-1 items-center justify-center">
                     <div className="w-full max-w-xs">
-                        {/* <RegisterForm /> */}
+                        <RegisterForm />
                     </div>
                 </div>
             </div>
