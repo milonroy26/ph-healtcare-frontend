@@ -45,12 +45,13 @@ export default function VerifyAccountForm() {
         if (resendTimer <= 0) {
             return;
         }
+
         const timer = setInterval(() => {
-            setResendTimer((prev) => prev - 1);
+            setResendTimer((prev) => Math.max(prev - 1, 0));
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [resendTimer]);
 
     const handleOTP = () => {
         //? Check if otp is valid
@@ -72,6 +73,7 @@ export default function VerifyAccountForm() {
                         description: "Something went wrong. Please try again",
                         type: "error",
                     });
+                    return;
                 }
 
                 toast.add({
