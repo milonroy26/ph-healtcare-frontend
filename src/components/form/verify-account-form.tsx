@@ -1,7 +1,6 @@
 "use client";
 
-// import { useVerifyAccount } from "@/hooks";
-import { useVerifyAccount } from "@/hooks";
+import { useVerifyAccount, useVerifyDoctorAccount } from "@/hooks";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,8 +19,11 @@ import { toast } from "../ui/toast";
 
 const RESEND_COOLDOWN = 120;
 
-export default function VerifyAccountForm() {
-
+export default function VerifyAccountForm({
+    mode = "patient",
+}: {
+    mode: "doctor" | "patient";
+}) {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -29,32 +31,32 @@ export default function VerifyAccountForm() {
     const [isInvalid, setIsInvalid] = useState(false);
     const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN);
 
-    const { mutate: verify, isPending: verifyPending } = useVerifyAccount();
+    const { mutate: verifyPatient } = useVerifyAccount();
+    const { mutate: verifyDoctor } = useVerifyDoctorAccount();
+
+    const verify = mode === "doctor" ? verifyDoctor : verifyPatient;
 
     const email = searchParams.get("email") || "";
 
-    //? Check if email is valid or not and redirect to home page
     useEffect(() => {
         if (!email) {
             router.push("/");
         }
     }, [email]);
 
-    //? Set resend timer
     useEffect(() => {
         if (resendTimer <= 0) {
             return;
         }
 
         const timer = setInterval(() => {
-            setResendTimer((prev) => Math.max(prev - 1, 0));
+            setResendTimer((prev) => prev - 1);
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [resendTimer]);
+    }, []);
 
     const handleOTP = () => {
-        //? Check if otp is valid
         if (otp.length !== 6) {
             setIsInvalid(true);
             return;
@@ -66,13 +68,24 @@ export default function VerifyAccountForm() {
         };
 
         verify(verifyData, {
-            onSuccess: (res: { success: any; }) => {
+            onSuccess: (res) => {
                 if (!res.success) {
                     toast.add({
                         title: "Server Failure",
                         description: "Something went wrong. Please try again",
                         type: "error",
                     });
+                }
+
+                if (mode === "doctor") {
+                    toast.add({
+                        title: "Verification Successful",
+                        description:
+                            "An admin will approve your account. This may take time. Please check your email in few days",
+                        type: "success",
+                    });
+                    router.push("/");
+
                     return;
                 }
 
@@ -83,7 +96,7 @@ export default function VerifyAccountForm() {
                 });
                 router.push("/");
             },
-            onError: (err: { message: any; }) => {
+            onError: (err) => {
                 toast.add({
                     title: "Verification failure",
                     description: err.message || "Something went wrong. Please try again",
