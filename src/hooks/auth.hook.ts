@@ -1,16 +1,23 @@
-import { getMe, gooleOAuthLogin, userLogin, userLogout, userRegistration, verifyAccount } from "@/api/auth.api";
+import {
+    getMe,
+    googleOAuth,
+    userLogin,
+    userLogout,
+    userRegistration,
+    verifyAccount,
+} from "@/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useLogin() {
     return useMutation({
         mutationFn: userLogin,
-    })
+    });
 }
 
 export function useVerifyAccount() {
     return useMutation({
         mutationFn: verifyAccount,
-    })
+    });
 }
 
 export function useRegistration() {
@@ -22,19 +29,19 @@ export function useRegistration() {
 export function useLogout() {
     return useMutation({
         mutationFn: userLogout,
-    })
+    });
 }
 
-export function useGoogleOAuthLogin() {
+export function useGoogleOAuth() {
     return useMutation({
-        mutationFn: gooleOAuthLogin,
-    })
+        mutationFn: googleOAuth,
+    });
 }
 
 export function useGetMe() {
     return useQuery({
         queryKey: ["user"],
         queryFn: getMe,
-        retry: false
+        retry: false,
     });
 }

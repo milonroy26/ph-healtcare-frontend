@@ -1,13 +1,13 @@
 "use client";
 
 import { toast } from "@/components/ui/toast";
-import { useGoogleOAuthLogin } from "@/hooks";
+import { useGoogleOAuth } from "@/hooks";
 import { GoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 
 export default function GoogleLoginComponent() {
   const router = useRouter();
-  const { mutate: googleLogin } = useGoogleOAuthLogin();
+  const { mutate: googleLogin } = useGoogleOAuth();
 
   const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
     const idToken = credentialResponse.credential;
