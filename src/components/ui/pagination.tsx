@@ -1,5 +1,5 @@
-import * as React from "react"
 import { cn } from "cn"
+import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
@@ -126,5 +126,5 @@ export {
   PaginationItem,
   PaginationLink,
   PaginationNext,
-  PaginationPrevious,
+  PaginationPrevious
 }
