@@ -8,3 +8,5 @@ export * from "./sidebar.type";
 
 export * from "./api.type";
 
+export * from "./schedule.type";
+

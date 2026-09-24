@@ -61,7 +61,7 @@ export default function DoctorApprovalTabs() {
         <DoctorApprovalTable
           {...queryParams}
           handleReview={setSelectedId}
-        // handlePageChange={setPage}
+          handlePageChange={setPage}
         />
       </Suspense>
 
