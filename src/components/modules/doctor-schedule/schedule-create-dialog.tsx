@@ -25,7 +25,7 @@ export default function ScheduleCreateDialog() {
             This schedule will be visible to patient
           </DialogDescription>
         </DialogHeader>
-        <CreateScheduleForm />
+        <CreateScheduleForm handleOnClose={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );

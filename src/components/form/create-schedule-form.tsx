@@ -7,8 +7,9 @@ import { Calendar } from "../ui/calendar";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { toast } from "../ui/toast";
 
-export default function CreateScheduleForm() {
+export default function CreateScheduleForm({ handleOnClose }: { handleOnClose: () => void }) {
   const { mutate: create, isPending } = useCreateSchedule();
 
   const form = useForm({
@@ -31,6 +32,34 @@ export default function CreateScheduleForm() {
       };
 
       console.log(scheduleValue);
+
+      create(scheduleValue, {
+        onSuccess: (res) => {
+          if (!res.success) {
+            toast.add({
+              title: "Server Failure",
+              description: "Something went wrong. Please try again",
+              type: "error",
+            });
+            return;
+          }
+          toast.add({
+            title: "Schedule Created",
+            description: "Your schedule is saved as a draft",
+            type: "success",
+          });
+          handleOnClose();
+        },
+        onError: (err) => {
+          toast.add({
+            title: "Schedule creation failed",
+            description:
+              err.message || "Something went wrong. Please try again",
+            type: "error",
+          });
+          handleOnClose();
+        },
+      });
     },
   });
 
@@ -50,19 +79,24 @@ export default function CreateScheduleForm() {
               ? new Date(`${field.state.value}T00:00:00`)
               : undefined;
 
-            console.log({ selected });
-
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Date</FieldLabel>
                 <Popover>
                   <PopoverTrigger render={<Button variant="outline" />}>
-                    Select Date
+                    {selected ? (
+                      format(selected, "PPP")
+                    ) : (
+                      <span className="text-muted-foreground">
+                        Select a date
+                      </span>
+                    )}
                   </PopoverTrigger>
-                  <PopoverContent>
+                  <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
                       selected={selected}
+                      disabled={{ before: new Date() }}
                       onSelect={(date) => {
                         if (date) {
                           field.handleChange(format(date, "yyyy-MM-dd"));
@@ -94,7 +128,7 @@ export default function CreateScheduleForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    className="bg-background"
+                    className="appearance-none bg-background"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -116,7 +150,7 @@ export default function CreateScheduleForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    className="bg-background"
+                    className="appearance-none bg-background"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
